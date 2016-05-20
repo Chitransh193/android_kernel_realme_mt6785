@@ -371,7 +371,7 @@ extern pgprot_t protection_map[16];
 #define FAULT_FLAG_REMOTE			0x80
 #define FAULT_FLAG_INSTRUCTION  		0x100
 #define FAULT_FLAG_INTERRUPTIBLE		0x200
-#define FAULT_FLAG_PREFAULT_OLD			0x400
+#define FAULT_FLAG_PREFAULT_OLD			0x400  /* Make faultaround ptes old */
 #define FAULT_FLAG_SPECULATIVE			0x800
 
 /*
@@ -399,7 +399,6 @@ static inline bool fault_flag_allow_retry_first(unsigned int flags)
 	return (flags & FAULT_FLAG_ALLOW_RETRY) &&
 	    (!(flags & FAULT_FLAG_TRIED));
 }
-
 #define FAULT_FLAG_TRACE \
 	{ FAULT_FLAG_WRITE,		"WRITE" }, \
 	{ FAULT_FLAG_MKWRITE,		"MKWRITE" }, \
@@ -410,7 +409,8 @@ static inline bool fault_flag_allow_retry_first(unsigned int flags)
 	{ FAULT_FLAG_USER,		"USER" }, \
 	{ FAULT_FLAG_REMOTE,		"REMOTE" }, \
 	{ FAULT_FLAG_INSTRUCTION,	"INSTRUCTION" }, \
-	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }
+	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }, \
+	{ FAULT_FLAG_PREFAULT_OLD,      "PREFAULT_OLD" }
 
 /*
  * vm_fault is filled by the the pagefault handler and passed to the vma's
@@ -3063,6 +3063,8 @@ void __init setup_nr_node_ids(void);
 #else
 static inline void setup_nr_node_ids(void) {}
 #endif
+
+extern int want_old_faultaround_pte;
 
 #endif /* __KERNEL__ */
 #endif /* _LINUX_MM_H */
