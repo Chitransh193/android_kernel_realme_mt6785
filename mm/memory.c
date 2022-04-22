@@ -4550,6 +4550,9 @@ static int __handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
 	return handle_pte_fault(&vmf);
 }
 
+static void lru_gen_enter_fault(struct vm_area_struct *vma);
+static void lru_gen_exit_fault(void);
+
 #ifdef CONFIG_SPECULATIVE_PAGE_FAULT
 
 #ifndef spf_pxd_flunked
@@ -4584,9 +4587,23 @@ static inline bool spf_access_error(unsigned long access_vm,
 }
 #endif
 
+#ifndef __HAVE_ARCH_PTE_SPECIAL
+/* This is required by vm_normal_page() */
+#error "Speculative page fault handler requires __HAVE_ARCH_PTE_SPECIAL"
+#endif
+/*
+ * vm_normal_page() adds some processing which should be done while
+ * hodling the mmap_sem.
+ */
+
 /*
  * Tries to handle the page fault in a speculative way, without grabbing the
  * mmap_sem.
+ * When VM_FAULT_RETRY is returned, the vma pointer is valid and this vma must
+ * be checked later when the mmap_sem has been grabbed by calling
+ * can_reuse_spf_vma().
+ * This is needed as the returned vma is kept in memory until the call to
+ * can_reuse_spf_vma() is made.
  */
 int __handle_speculative_fault(struct mm_struct *mm, unsigned long address,
 			       unsigned int flags, unsigned long access_vm)
@@ -4602,7 +4619,6 @@ int __handle_speculative_fault(struct mm_struct *mm, unsigned long address,
 #ifdef CONFIG_NUMA
 	struct mempolicy *pol;
 #endif
-
 	/* Clear flags that may lead to release the mmap_sem to retry */
 	flags &= ~(FAULT_FLAG_ALLOW_RETRY|FAULT_FLAG_KILLABLE);
 	flags |= FAULT_FLAG_SPECULATIVE;
@@ -4785,7 +4801,9 @@ int __handle_speculative_fault(struct mm_struct *mm, unsigned long address,
 	}
 
 	mem_cgroup_oom_enable();
+	lru_gen_enter_fault(vmf.vma);
 	ret = handle_pte_fault(&vmf);
+	lru_gen_exit_fault();
 	/* NOTE: vmf.pte should be unmapped after handle_pte_fault */
 	mem_cgroup_oom_disable();
 
