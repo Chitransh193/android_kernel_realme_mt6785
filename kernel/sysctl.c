@@ -149,9 +149,15 @@ static unsigned long zero_ul;
 static unsigned long one_ul = 1;
 static unsigned long long_max = LONG_MAX;
 static int one_hundred = 100;
-#ifdef CONFIG_MTK_GMO_RAM_OPTIMIZE
 static int two_hundred = 200;
+
+#ifdef CONFIG_OPLUS_MM_HACKS
+extern int direct_vm_swappiness;
+#endif /* CONFIG_OPLUS_MM_HACKS */
+
+#ifdef CONFIG_MTK_GMO_RAM_OPTIMIZE
 #endif
+
 #if defined(OPLUS_FEATURE_FG_IO_OPT) && defined(CONFIG_OPPO_FG_IO_OPT)
 /*Huacai.Zhou@Tech.Kernel.MM, 2020-03-23,add foreground io opt*/
 unsigned int sysctl_fg_io_opt = 1;
@@ -1735,12 +1741,37 @@ static struct ctl_table vm_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &zero,
+#ifdef CONFIG_OPLUS_MM_HACKS
+		.extra2         = &two_hundred,
+#else
+		.extra2		= &one_hundred,
+#endif /* CONFIG_OPLUS_MM_HACKS */
+
 #ifndef CONFIG_MTK_GMO_RAM_OPTIMIZE
 		.extra2		= &one_hundred,
 #else
 		.extra2		= &two_hundred,
 #endif
-		.extra2		= &one_hundred,
+	},
+#ifdef CONFIG_OPLUS_MM_HACKS
+	{
+	        .procname	= "direct_swappiness",
+		.data		= &direct_vm_swappiness,
+		.maxlen 	= sizeof(direct_vm_swappiness),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1 	= &zero,
+		.extra2 	= &two_hundred,
+	},
+#endif /* CONFIG_OPLUS_MM_HACKS */
+	{
+		.procname       = "want_old_faultaround_pte",
+		.data           = &want_old_faultaround_pte,
+		.maxlen         = sizeof(want_old_faultaround_pte),
+		.mode           = 0644,
+		.proc_handler   = proc_dointvec_minmax,
+		.extra1         = &zero,
+		.extra2         = &one,
 	},
 #ifdef CONFIG_HUGETLB_PAGE
 	{
