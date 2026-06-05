@@ -149,13 +149,14 @@ static unsigned long zero_ul;
 static unsigned long one_ul = 1;
 static unsigned long long_max = LONG_MAX;
 static int one_hundred = 100;
-static int two_hundred = 200;
 
 #ifdef CONFIG_OPLUS_MM_HACKS
 extern int direct_vm_swappiness;
+static int sixty = 60;
 #endif /* CONFIG_OPLUS_MM_HACKS */
 
 #ifdef CONFIG_MTK_GMO_RAM_OPTIMIZE
+static int two_hundred = 200;
 #endif
 
 #if defined(OPLUS_FEATURE_FG_IO_OPT) && defined(CONFIG_OPPO_FG_IO_OPT)
@@ -1741,11 +1742,7 @@ static struct ctl_table vm_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &zero,
-#ifdef CONFIG_OPLUS_MM_HACKS
-		.extra2         = &two_hundred,
-#else
 		.extra2		= &one_hundred,
-#endif /* CONFIG_OPLUS_MM_HACKS */
 
 #ifndef CONFIG_MTK_GMO_RAM_OPTIMIZE
 		.extra2		= &one_hundred,
@@ -1758,10 +1755,10 @@ static struct ctl_table vm_table[] = {
 	        .procname	= "direct_swappiness",
 		.data		= &direct_vm_swappiness,
 		.maxlen 	= sizeof(direct_vm_swappiness),
-		.mode		= 0644,
+		.mode		= 0444,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1 	= &zero,
-		.extra2 	= &two_hundred,
+		.extra2 	= &sixty,
 	},
 #endif /* CONFIG_OPLUS_MM_HACKS */
 	{
