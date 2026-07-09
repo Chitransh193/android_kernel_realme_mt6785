@@ -33,6 +33,8 @@
 
 #include <uapi/linux/sched/types.h>
 
+unsigned long boosted_cpu_util(int cpu);
+
 /**************************************************************
  * Version Information:
  */
