@@ -33,6 +33,8 @@
 
 #include <uapi/linux/sched/types.h>
 
+unsigned long boosted_cpu_util(int cpu);
+
 /**************************************************************
  * Version Information:
  */
@@ -304,7 +306,7 @@ static void rfx_get_util(struct rfx_cpu *rfx_c, unsigned long boost)
 {
 	struct rq *rq = cpu_rq(rfx_c->cpu);
 	sched_avg_update(rq);
-	unsigned long util = boosted_cpu_util(rfx_c->cpu, NULL);
+	unsigned long util = boosted_cpu_util(rfx_c->cpu);
 	unsigned long max_cap = arch_scale_cpu_capacity(NULL, rfx_c->cpu);
 	
 	rfx_c->bw_min = 0;
