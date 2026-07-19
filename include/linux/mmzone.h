@@ -595,6 +595,8 @@ struct page_label {
 };
 #endif
 
+#define ASYNC_AND_SYNC 2
+
 struct zone {
 	/* Read-mostly fields */
 
