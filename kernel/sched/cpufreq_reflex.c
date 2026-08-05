@@ -309,7 +309,7 @@ static void rfx_get_util(struct rfx_cpu *rfx_c, unsigned long boost)
 
         sched_avg_update(rq);
 
-        util = boosted_cpu_util(rfx_c->cpu, NULL);
+        util = boosted_cpu_util(rfx_c->cpu);
 
         rfx_c->bw_min = 0;
         rfx_c->util = max(util, boost);
