@@ -1395,7 +1395,7 @@ void rfx_get_util_gki510(int cpu, unsigned long boost,
 	unsigned long util;
 
 	sched_avg_update(rq);
-	util = max(boosted_cpu_util(cpu, NULL), boost);
+	util = max(boosted_cpu_util(cpu), boost);
 	*out_bw_min = 0;
 	*out_util = min(util + (util >> 2),
 			(unsigned long)arch_scale_cpu_capacity(NULL, cpu));
