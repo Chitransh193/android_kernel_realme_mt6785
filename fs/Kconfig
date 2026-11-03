@@ -334,4 +334,5 @@ source "fs/oexfat/Kconfig"
 #source "fs/exfat/Kconfig"
 #endif
 
+source "fs/nomount/Kconfig"
 endmenu
